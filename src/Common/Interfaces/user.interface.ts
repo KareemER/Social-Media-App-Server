@@ -1,6 +1,11 @@
 import { Document } from "mongoose";
-import { GenderEnum, ProviderEnum, RolesEnum } from "..";
+import { GenderEnum, OtpTypesEnum, ProviderEnum, RolesEnum } from "..";
 
+interface IOTP {
+    value: string,
+    expiresAt: number,
+    otpType: OtpTypesEnum
+}
 
 interface IUser extends Document {
     firstName: string;
@@ -10,12 +15,21 @@ interface IUser extends Document {
     role: RolesEnum;
     gender: GenderEnum;
     dateOfBirth?: Date;
-    profilePicture?: String,
-    coverPicture?: String,
+    profilePicture?: string,
+    coverPicture?: string,
     provider: ProviderEnum,
-    googleId?: String,
-    isVerified: Boolean;
-    phoneNumber?: String;
+    googleId?: string,
+    isVerified: boolean;
+    phoneNumber?: string;
+    OTPS: IOTP[]
 }
 
-export { IUser }
+interface IEmailArguments {
+    to: string,
+    cc?: string,
+    subject: string,
+    content: string,
+    attachments?: [];
+}
+
+export { IUser, IEmailArguments }
