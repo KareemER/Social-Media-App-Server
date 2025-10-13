@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { GenderEnum, ProviderEnum, RolesEnum, IUser } from "../../Common";
+import { GenderEnum, ProviderEnum, RolesEnum, IUser, OtpTypesEnum } from "../../Common";
 
 
 const userSchema = new mongoose.Schema<IUser>(
@@ -49,7 +49,12 @@ const userSchema = new mongoose.Schema<IUser>(
             type: Boolean,
             default: false
         },
-        phoneNumber: String
+        phoneNumber: String,
+        OTPS: [{
+            value: { type: String, require: true },
+            expiresAt: { type: Date, default: Date.now() + 6000000 }, // default 100 min from its creation
+            otpType: { type: String, enum: OtpTypesEnum, required: true }
+        }]
     }
 )
 

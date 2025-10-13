@@ -6,15 +6,11 @@ enum GenderEnum {
     RATHER_NOT_SAY = "rather_not_say"
 }
 
-
-
 enum RolesEnum {
     USER = "user",
     ADMIN = "admin",
     SUPER_ADMIN = "super_admin"
 }
-
-
 
 enum ProviderEnum {
     LOCAL = "local",
@@ -22,4 +18,9 @@ enum ProviderEnum {
     FACEBOOK = "facebook"
 }
 
-export { GenderEnum, RolesEnum, ProviderEnum}
+enum OtpTypesEnum {
+    CONFIRMATION = 'confirmation',
+    RESET_PASSWORD = 'reset-password'
+}
+
+export { GenderEnum, RolesEnum, ProviderEnum, OtpTypesEnum }
