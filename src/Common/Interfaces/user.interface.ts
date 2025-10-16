@@ -21,7 +21,7 @@ interface IUser extends Document {
     googleId?: string,
     isVerified: boolean;
     phoneNumber?: string;
-    OTPS: IOTP[]
+    OTPS?: IOTP[]
 }
 
 interface IEmailArguments {
