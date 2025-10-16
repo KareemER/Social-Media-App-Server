@@ -9,8 +9,7 @@ export const sendEmail = async (
         subject,
         content,
         attachments = []
-    }: IEmailArguments
-) => {
+    }: IEmailArguments ) => {
     const transporter = nodemailer.createTransport({
         host: 'smtp.gmail.com',
         port: 465,

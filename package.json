@@ -2,6 +2,7 @@
   "dependencies": {
     "@types/bcrypt": "^6.0.0",
     "@types/express": "^5.0.3",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/nodemailer": "^7.0.2",
     "bcrypt": "^6.0.0",
     "dotenv": "^17.2.3",
@@ -10,6 +11,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.19.1",
     "nodemailer": "^7.0.9",
-    "ts-node": "^10.9.2"
+    "ts-node": "^10.9.2",
+    "uuid": "^13.0.0"
   }
 }
