@@ -1,5 +1,3 @@
-
-
 enum GenderEnum {
     FEMALE = "female",
     MALE = "male",
@@ -23,4 +21,4 @@ enum OtpTypesEnum {
     RESET_PASSWORD = 'reset-password'
 }
 
-export { GenderEnum, RolesEnum, ProviderEnum, OtpTypesEnum }
+export { GenderEnum, RolesEnum, ProviderEnum, OtpTypesEnum };
