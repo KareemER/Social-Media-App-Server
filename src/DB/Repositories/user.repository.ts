@@ -7,7 +7,7 @@ import { BaseRepository } from "./base.repository";
 
 export class UserRepository extends BaseRepository<IUser>{
     constructor(protected _usermodel:Model<IUser>){
-        super(_usermodel)
+        super(_usermodel);
     }
 }
 

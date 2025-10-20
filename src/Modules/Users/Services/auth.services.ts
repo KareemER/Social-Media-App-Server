@@ -1,15 +1,16 @@
 import { Request, Response } from "express";
-import { IUser, OtpTypesEnum } from "../../../Common";
-import { UserRepository } from "../../../DB/Repositories/user.repository";
-import { UserModel } from "../../../DB/Models";
-import { compareHash, encrypt, generateToken, generatHash, localEmitter } from "../../../Utils";
-import { SignOptions } from "jsonwebtoken";
 import { v4 as uuidv4 } from "uuid";
+import { SignOptions } from "jsonwebtoken";
+
+import { IRequest, IUser, OtpTypesEnum } from "../../../Common";
+import { BlackListedTokenRepository, UserRepository } from "../../../DB/Repositories";
+import { BlackListedTokenModel, UserModel } from "../../../DB/Models";
+import { compareHash, encrypt, generateToken, generatHash, localEmitter } from "../../../Utils";
 
 class AuthService {
 
-    private userRepo: UserRepository = new UserRepository(UserModel)
-
+    private userRepo: UserRepository = new UserRepository(UserModel);
+    private blackListedTokenRepo: BlackListedTokenRepository = new BlackListedTokenRepository(BlackListedTokenModel)
     /**
     * ===================================
     * @API post /api/auth/signUp
@@ -19,20 +20,20 @@ class AuthService {
     */
 
     SignUp = async (req: Request, res: Response) => {
-        const { firstName, lastName, email, password, gender, dateOfBirth, phoneNumber }: Partial<IUser> = req.body
+        const { firstName, lastName, email, password, gender, dateOfBirth, phoneNumber }: Partial<IUser> = req.body;
 
         // checks the existence of the email
-        const isEmailExists = await this.userRepo.findOneDocument({ email }, 'email')
-        if (isEmailExists) return res.status(409).json({ message: 'Email already exists.', data: { invalidEmail: email } })
+        const isEmailExists = await this.userRepo.findOneDocument({ email }, 'email');
+        if (isEmailExists) return res.status(409).json({ message: 'Email already exists.', data: { invalidEmail: email } });
 
         // Encypting Phone Number
-        const encryptedPhoneNumber = encrypt(phoneNumber as string)
+        const encryptedPhoneNumber = encrypt(phoneNumber as string);
 
         // Hashing User's Password
-        const hashedPassword = generatHash(password as string)
+        const hashedPassword = generatHash(password as string);
 
         // Sending OTP
-        const otp = Math.floor(Math.random() * 1000000).toString()
+        const otp = Math.floor(Math.random() * 1000000).toString();
         localEmitter.emit('sendEmail', {
             to: email,
             subject: 'OTP for SignUp',
@@ -56,7 +57,7 @@ class AuthService {
             OTPS: [confirmationOtp]
         })
 
-        return res.status(201).json({ message: 'User created successfully', data: { newUser } })
+        return res.status(201).json({ message: 'User created successfully', data: { newUser } });
     }
 
     /**
@@ -67,15 +68,15 @@ class AuthService {
     * 
     */
 
-    confirmEmailService = async (req: Request, res: Response) => {
-        const { email, otp } = req.body
+    ConfirmEmailService = async (req: Request, res: Response) => {
+        const { email, otp } = req.body;
 
         //Searching for user
-        const user: IUser | null = await this.userRepo.findOneDocument({ email, isVerified: false })
-        if (!user) return res.status(401).json({ message: 'Your credentials are not correct' })
+        const user: IUser | null = await this.userRepo.findOneDocument({ email, isVerified: false });
+        if (!user) return res.status(401).json({ message: 'Your credentials are not correct' });
 
         //Searching for user's OTP
-        let userOtp = user.OTPS?.find((otp) => otp.otpType == OtpTypesEnum.CONFIRMATION)
+        let userOtp = user.OTPS?.find((otp) => otp.otpType == OtpTypesEnum.CONFIRMATION);
 
         //Checking if the OTP is valid
         const isOtpMatched = compareHash(otp, userOtp?.value as string);
@@ -102,20 +103,20 @@ class AuthService {
     */
 
     SignIn = async (req: Request, res: Response) => {
-        const { email, password } = req.body
+        const { email, password } = req.body;
 
         //Searching for user
-        const user: IUser | null = await this.userRepo.findOneDocument({ email })
-        if (!user) return res.status(401).json({ message: 'Your credentials are not correct' })
+        const user: IUser | null = await this.userRepo.findOneDocument({ email });
+        if (!user) return res.status(401).json({ message: 'Your credentials are not correct' });
 
         //Checking if the password is correct
-        const isPasswordMatched = compareHash(password, user.password)
-        if (!isPasswordMatched) return res.status(401).json({ message: 'Your credentials are not correct' })
+        const isPasswordMatched = compareHash(password, user.password);
+        if (!isPasswordMatched) return res.status(401).json({ message: 'Your credentials are not correct' });
 
         //Generating access token
         const accessToken = generateToken(
             {
-                id: user._id,
+                _id: user._id,
                 email: user.email,
                 provider: user.provider,
                 role: user.role
@@ -125,12 +126,12 @@ class AuthService {
                 expiresIn: process.env.JWT_ACCESS_EXPIRES_IN as SignOptions["expiresIn"],
                 jwtid: uuidv4()
             }
-        )
+        );
 
         //Generating refresh token
         const refreshToken = generateToken(
             {
-                id: user._id,
+                _id: user._id,
                 email: user.email,
                 provider: user.provider,
                 role: user.role
@@ -140,9 +141,27 @@ class AuthService {
                 expiresIn: process.env.JWT_REFRESH_EXPIRES_IN as SignOptions["expiresIn"],
                 jwtid: uuidv4()
             }
-        )
-        return res.status(200).json({ message: 'User Logged in successfully', data: { tokens: { accessToken, refreshToken } } })
+        );
+
+        return res.status(200).json({ message: 'User Logged in successfully', data: { tokens: { accessToken, refreshToken } } });
+    }
+
+    /**
+    * ===================================
+    * @API post /api/auth/logOut
+    * ===================================
+    * @description : Logs a user out
+    * 
+    */
+
+    LogOut = async (req: Request, res: Response) => {
+        const { token: { jti, exp } } = (req as unknown as IRequest).loggedInUser;
+
+        // Adding the used token to the black list
+        const blackListedToken = await this.blackListedTokenRepo.createNewDocument({ tokenId: jti, expiresAt: new Date(exp || Date.now() + 600000) })
+
+        return res.status(200).json({ message: 'User Logged Out Successfully', data: { blackListedToken } })
     }
 }
 
-export default new AuthService()
+export default new AuthService();

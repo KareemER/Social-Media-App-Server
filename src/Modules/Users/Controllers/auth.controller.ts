@@ -1,16 +1,20 @@
 import { Router } from "express";
+
 import authServices from "../Services/auth.services";
-const authController = Router()
+import { authenticationMiddleware } from "../../../Middlewares";
+
+const authController = Router();
 
 // Sign Up
-authController.post('/signUp', authServices.SignUp)
+authController.post('/signUp', authServices.SignUp);
 
-// confirm email
-authController.post('/confirmEmail', authServices.confirmEmailService)
+// Confirm email
+authController.post('/confirmEmail', authServices.ConfirmEmailService);
 
 // Sign In
-authController.post('/signIn', authServices.SignIn)
+authController.post('/signIn', authServices.SignIn);
 
+// Log out
+authController.post('/logOut', authenticationMiddleware, authServices.LogOut)
 
-
-export { authController }
+export { authController };
