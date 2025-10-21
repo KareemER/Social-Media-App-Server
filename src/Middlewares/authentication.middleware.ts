@@ -27,8 +27,8 @@ export const authenticationMiddleware = async (req: Request, res: Response, next
     if (!decodedData._id) return res.status(401).json({ message: "Invalid payload" });
 
     //Checking wherther the token is black listed or not
-    const blacklistedToken = await blackListedTokenRepo.findOneDocument({ token: decodedData.jti });
-    if (!blacklistedToken) return res.status(401).json({ message: 'Your session is expired' })
+    const blacklistedToken = await blackListedTokenRepo.findOneDocument({ tokenId: decodedData.jti });
+    if (blacklistedToken) return res.status(401).json({ message: 'Your session is expired' });
 
     // finding and checking user's existence by id
     const user: IUser | null = await userRepo.findDocumentById(decodedData._id, '-password');
