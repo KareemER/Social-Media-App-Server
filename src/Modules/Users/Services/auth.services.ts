@@ -5,12 +5,13 @@ import { SignOptions } from "jsonwebtoken";
 import { IRequest, IUser, OtpTypesEnum } from "../../../Common";
 import { BlackListedTokenRepository, UserRepository } from "../../../DB/Repositories";
 import { BlackListedTokenModel, UserModel } from "../../../DB/Models";
-import { compareHash, encrypt, generateToken, generatHash, localEmitter } from "../../../Utils";
+import { compareHash, ConflictException, encrypt, generateToken, generatHash, localEmitter, SuccessResponse } from "../../../Utils";
 
 class AuthService {
 
     private userRepo: UserRepository = new UserRepository(UserModel);
     private blackListedTokenRepo: BlackListedTokenRepository = new BlackListedTokenRepository(BlackListedTokenModel)
+    
     /**
     * ===================================
     * @API post /api/auth/signUp
@@ -24,7 +25,7 @@ class AuthService {
 
         // checks the existence of the email
         const isEmailExists = await this.userRepo.findOneDocument({ email }, 'email');
-        if (isEmailExists) return res.status(409).json({ message: 'Email already exists.', data: { invalidEmail: email } });
+        if (isEmailExists) throw new ConflictException('Email already exists.', { invalidEmail: email });
 
         // Encypting Phone Number
         const encryptedPhoneNumber = encrypt(phoneNumber as string);
@@ -57,7 +58,7 @@ class AuthService {
             OTPS: [confirmationOtp]
         })
 
-        return res.status(201).json({ message: 'User created successfully', data: { newUser } });
+        return res.status(201).json(SuccessResponse<IUser>("User created successfully", 201, newUser));
     }
 
     /**

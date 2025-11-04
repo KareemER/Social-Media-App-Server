@@ -24,7 +24,8 @@ const userSchema = new mongoose.Schema<IUser>(
         },
         password: {
             type: String,
-            required: true
+            required: true,
+            minLength: [8, "Last name must contain more than 8 letters"]
         },
         role: {
             type: String,

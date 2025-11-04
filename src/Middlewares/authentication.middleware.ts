@@ -1,7 +1,7 @@
 import { Request, NextFunction, Response } from "express";
 import { JwtPayload } from "jsonwebtoken";
 
-import { verifyToken } from "../Utils";
+import { HttpException, verifyToken } from "../Utils";
 import { IRequest, IUser } from "../Common";
 import { BlackListedTokenRepository, UserRepository } from "../DB/Repositories";
 import { BlackListedTokenModel, UserModel } from "../DB/Models";
@@ -13,7 +13,7 @@ export const authenticationMiddleware = async (req: Request, res: Response, next
     const { authentication: accessToken } = req.headers;
 
     // Checking wherther there is a token or not
-    if (!accessToken) return res.status(401).json({ message: 'Please Login first' });
+    if (!accessToken) throw next(new HttpException("Please Login first", 400));
 
     // Adding a type guard that converts the header to a string
     const tokenString = Array.isArray(accessToken) ? accessToken[0] : accessToken;

@@ -22,6 +22,10 @@ export abstract class BaseRepository<T> {
 
     async deleteOneDocument() { }
 
+    async deleteOneDocumentById(id: mongoose.Schema.Types.ObjectId) { 
+        return await this.model.findByIdAndDelete(id);
+    }
+
     async deleteMultipleDocuments() { }
 
     async findAndUpdateDocument() { }
