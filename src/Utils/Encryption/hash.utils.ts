@@ -2,7 +2,7 @@ import { compareSync, hashSync } from "bcrypt";
 
 // ===================================================== Generating Hash =====================================================
 
-export const generatHash = (plainText: string, saltRounds: number = parseInt(process.env.SALT_ROUNDS as string)): string => {
+export const generateHash = (plainText: string, saltRounds: number = parseInt(process.env.SALT_ROUNDS as string)): string => {
     return hashSync(plainText, saltRounds);
 };
 

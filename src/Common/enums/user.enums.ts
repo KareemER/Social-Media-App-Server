@@ -21,4 +21,15 @@ enum OtpTypesEnum {
     RESET_PASSWORD = 'reset-password'
 }
 
-export { GenderEnum, RolesEnum, ProviderEnum, OtpTypesEnum };
+enum FriendShipStatusEnum {
+    PENDING = 'pending',
+    ACCEPTED = 'accepted',
+    REJECTED = 'rejected'
+}
+
+enum ConversationTypeEnum {
+    DIRECT = 'direct',
+    GROUP = 'group'
+}
+
+export { GenderEnum, RolesEnum, ProviderEnum, OtpTypesEnum, FriendShipStatusEnum, ConversationTypeEnum };

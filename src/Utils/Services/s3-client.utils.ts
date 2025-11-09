@@ -22,7 +22,7 @@ export class S3ClientService {
             Bucket: process.env.AWS_BUCKET_NAME as string,
             Key: key
         })
-        return await getSignedUrl(this.s3Client, getCommand, {expiresIn})
+        return await getSignedUrl(this.s3Client, getCommand, { expiresIn })
     }
 
     async uploadFileOnS3(file: Express.Multer.File, key: string) {
@@ -42,13 +42,18 @@ export class S3ClientService {
 
         // Executing the command
         await this.s3Client.send(putCommand)
-    
+
         // Getting the signed URL
         const signedUrl = await this.getFileWithSignedUrl(keyName)
         return {
-            key:keyName,
+            key: keyName,
             signedUrl
         }
+    }
+    
+    async UploadFilesOnS3(files: Express.Multer.File[], key: string) {
+        const keys = files.map(file => this.uploadFileOnS3(file, key))
+        return await Promise.all(keys)
     }
 
     async deleteFileFromS3(key: string) {
@@ -58,7 +63,7 @@ export class S3ClientService {
         })
         return await this.s3Client.send(deleteCommand)
     }
-    
+
     async deleteBulkFromS3(keys: string[]) {
         const deleteCommand = new DeleteObjectsCommand({
             Bucket: process.env.AWS_BUCKET_NAME as string,

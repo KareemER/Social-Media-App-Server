@@ -1,8 +1,8 @@
-import { Document } from "mongoose";
+import { Document, Types } from "mongoose";
 import { Request } from "express";
 import { JwtPayload } from "jsonwebtoken";
 
-import { GenderEnum, OtpTypesEnum, ProviderEnum, RolesEnum } from "..";
+import { FriendShipStatusEnum, GenderEnum, OtpTypesEnum, ProviderEnum, RolesEnum } from "..";
 
 interface IOTP {
     value: string;
@@ -44,4 +44,10 @@ interface IBlackListedToken extends Document {
     expiresAt: Date
 }
 
-export { IUser, IEmailArguments, IRequest, IBlackListedToken };
+interface IFriendShip extends Document{
+    requestFromId: Types.ObjectId;
+    requestToId: Types.ObjectId;
+    status: FriendShipStatusEnum;
+}
+
+export { IUser, IEmailArguments, IRequest, IBlackListedToken, IFriendShip };

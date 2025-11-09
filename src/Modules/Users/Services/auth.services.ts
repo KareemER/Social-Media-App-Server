@@ -5,7 +5,7 @@ import { SignOptions } from "jsonwebtoken";
 import { IRequest, IUser, OtpTypesEnum } from "../../../Common";
 import { BlackListedTokenRepository, UserRepository } from "../../../DB/Repositories";
 import { BlackListedTokenModel, UserModel } from "../../../DB/Models";
-import { compareHash, ConflictException, encrypt, generateToken, generatHash, localEmitter, SuccessResponse } from "../../../Utils";
+import { compareHash, ConflictException, generateToken, generateHash, localEmitter, SuccessResponse } from "../../../Utils";
 
 class AuthService {
 
@@ -27,11 +27,11 @@ class AuthService {
         const isEmailExists = await this.userRepo.findOneDocument({ email }, 'email');
         if (isEmailExists) throw new ConflictException('Email already exists.', { invalidEmail: email });
 
-        // Encypting Phone Number
-        const encryptedPhoneNumber = encrypt(phoneNumber as string);
+        // // Encypting Phone Number
+        // const encryptedPhoneNumber = encrypt(phoneNumber as string);
 
-        // Hashing User's Password
-        const hashedPassword = generatHash(password as string);
+        // // Hashing User's Password
+        // const hashedPassword = generateHash(password as string);
 
         // Sending OTP
         const otp = Math.floor(Math.random() * 1000000).toString();
@@ -41,7 +41,7 @@ class AuthService {
             content: `Your OTP is ${otp}`
         })
         const confirmationOtp = {
-            value: generatHash(otp),
+            value: generateHash(otp),
             expiresAt: Date.now() + 6000000,
             otpType: OtpTypesEnum.CONFIRMATION
         }
@@ -51,10 +51,10 @@ class AuthService {
             firstName,
             lastName,
             email,
-            password: hashedPassword,
+            password,
             gender,
             dateOfBirth,
-            phoneNumber: encryptedPhoneNumber,
+            phoneNumber,
             OTPS: [confirmationOtp]
         })
 
